@@ -1,4 +1,5 @@
 import 'package:flix_tap/presentation/providers/providers.dart';
+import 'package:flix_tap/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flix_tap/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,14 +34,20 @@ class _HomeViewState extends ConsumerState<_HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    //final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final slideshowMovies = ref.watch(moviesSlideshowProvider);
 
     return Column(
       children: [
-        const CustomAppbar(),
+        CustomAppbar(),
 
         MoviesSlideshow(movies: slideshowMovies),
+
+        MovieHorizontalListview(
+          movies: nowPlayingMovies,
+          title: 'En cines',
+          subTitle: 'Lunes 20',
+        ),
       ],
     );
   }
