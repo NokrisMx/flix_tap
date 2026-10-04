@@ -3,6 +3,7 @@ import 'package:flix_tap/config/constants/environment.dart';
 import 'package:flix_tap/domain/entities/movie.dart';
 import 'package:flix_tap/domain/datasources/movies_datasource.dart';
 import 'package:flix_tap/infrastructure/mappers/movie_mapper.dart';
+import 'package:flix_tap/infrastructure/models/moviedb/movie_details.dart';
 import 'package:flix_tap/infrastructure/models/moviedb/moviedb_response.dart';
 
 class MoviedbDatasource extends MoviesDatasource {
@@ -58,5 +59,16 @@ class MoviedbDatasource extends MoviesDatasource {
       queryParameters: {'page': page},
     );
     return _jsonToMovies(response.data);
+  }
+
+  @override
+  Future<Movie> getMovieById(String id) async {
+    final response = await dio.get('/movie/$id');
+    if (response.statusCode != 200) {
+      throw Exception('Movie with id $id not found');
+    }
+
+    final movieDetails = MovieDetails.fromJson(response.data);
+    return MovieMapper.movieDetailsToEntity(movieDetails);
   }
 }
