@@ -125,14 +125,15 @@ class _MovieDetails extends ConsumerWidget {
         //Actores
         _ActorsByMovie(movieId: movie.id.toString()),
 
-        // Películas similares
-        MovieHorizontalListview(
-          movies: similarMovies,
-          title: 'Películas similares',
-          loadNextPage: () => ref
-              .read(similarMoviesProvider(movie.id.toString()).notifier)
-              .loadNextPage(),
-        ),
+        if (similarMovies.isNotEmpty)
+          // Películas similares
+          MovieHorizontalListview(
+            movies: similarMovies,
+            title: 'Películas similares',
+            loadNextPage: () => ref
+                .read(similarMoviesProvider(movie.id.toString()).notifier)
+                .loadNextPage(),
+          ),
 
         SizedBox(height: 50),
       ],
@@ -154,50 +155,64 @@ class _ActorsByMovie extends ConsumerWidget {
     }
     final actors = actorsByMovie[movieId]!;
 
-    return SizedBox(
-      height: 300,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: actors.length,
-        itemBuilder: (context, index) {
-          final actor = actors[index];
+    if (actors.isEmpty) {
+      return SizedBox.shrink();
+    }
 
-          return Container(
-            padding: EdgeInsets.all(8.0),
-            width: 135,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Actor Photo
-                FadeInRight(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      actor.profilePath,
-                      height: 180,
-                      width: 135,
-                      fit: BoxFit.cover,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Text('Elenco', style: Theme.of(context).textTheme.titleLarge),
+        ),
+
+        SizedBox(
+          height: 300,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: actors.length,
+            itemBuilder: (context, index) {
+              final actor = actors[index];
+
+              return Container(
+                padding: EdgeInsets.all(8.0),
+                width: 135,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Actor Photo
+                    FadeInRight(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          actor.profilePath,
+                          height: 180,
+                          width: 135,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                // Nombre
-                SizedBox(height: 5),
+                    // Nombre
+                    SizedBox(height: 5),
 
-                Text(actor.name, maxLines: 2),
-                Text(
-                  actor.character ?? '',
-                  maxLines: 2,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    Text(actor.name, maxLines: 2),
+                    Text(
+                      actor.character ?? '',
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

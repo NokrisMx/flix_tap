@@ -66,7 +66,7 @@ class MovieDetails {
     imdbId: json["imdb_id"],
     originalLanguage: json["original_language"],
     originalTitle: json["original_title"],
-    overview: json["overview"],
+    overview: json["overview"] ?? '',
     popularity: json["popularity"]?.toDouble(),
     posterPath: json["poster_path"],
     productionCompanies: List<ProductionCompany>.from(
@@ -129,14 +129,14 @@ class BelongsToCollection {
   BelongsToCollection({
     required this.id,
     required this.name,
-    required this.posterPath,
-    required this.backdropPath,
+    this.posterPath,
+    this.backdropPath,
   });
 
   final int id;
   final String name;
-  final String posterPath;
-  final String backdropPath;
+  final String? posterPath;
+  final String? backdropPath;
 
   factory BelongsToCollection.fromJson(Map<String, dynamic> json) =>
       BelongsToCollection(
