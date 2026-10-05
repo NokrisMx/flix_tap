@@ -1,4 +1,5 @@
 import 'package:flix_tap/presentation/providers/actors/actors_by_movie_provider.dart';
+import 'package:flix_tap/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
@@ -26,6 +27,9 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
     ref.read(movieInfoProvider.notifier).loadMovie(widget.movieId);
     ref.read(actorsByMovieProvider.notifier).loadActors(widget.movieId);
+    ref
+        .read(similarMoviesProvider(widget.movieId.toString()).notifier)
+        .loadNextPage();
   }
 
   @override
@@ -55,15 +59,17 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
   }
 }
 
-class _MovieDetails extends StatelessWidget {
+class _MovieDetails extends ConsumerWidget {
   final Movie movie;
 
   const _MovieDetails({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
     final textStyles = Theme.of(context).textTheme;
+
+    final similarMovies = ref.watch(similarMoviesProvider(movie.id.toString()));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +122,17 @@ class _MovieDetails extends StatelessWidget {
           ),
         ),
 
+        //Actores
         _ActorsByMovie(movieId: movie.id.toString()),
+
+        // Películas similares
+        MovieHorizontalListview(
+          movies: similarMovies,
+          title: 'Películas similares',
+          loadNextPage: () => ref
+              .read(similarMoviesProvider(movie.id.toString()).notifier)
+              .loadNextPage(),
+        ),
 
         SizedBox(height: 50),
       ],

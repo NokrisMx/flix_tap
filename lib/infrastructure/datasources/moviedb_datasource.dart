@@ -71,4 +71,19 @@ class MoviedbDatasource extends MoviesDatasource {
     final movieDetails = MovieDetails.fromJson(response.data);
     return MovieMapper.movieDetailsToEntity(movieDetails);
   }
+
+  @override
+  Future<List<Movie>> getSimilarMovieById({
+    required String id,
+    int page = 1,
+  }) async {
+    final response = await dio.get(
+      '/movie/$id/similar',
+      queryParameters: {'page': page},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Movie with id $id not found');
+    }
+    return _jsonToMovies(response.data);
+  }
 }
