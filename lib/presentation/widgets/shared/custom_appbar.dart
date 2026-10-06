@@ -1,30 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flix_tap/domain/entities/movie.dart';
+import 'package:flix_tap/presentation/delegates/search_movie_delegate.dart';
+import 'package:flix_tap/presentation/providers/providers.dart';
 
-class CustomAppbar extends StatelessWidget {
+class CustomAppbar extends ConsumerWidget {
   const CustomAppbar({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final (colors, titleStyle) = (
-      Theme.of(context).colorScheme,
-      Theme.of(context).textTheme.titleMedium,
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
+    final titleStyle = Theme.of(context).textTheme.titleMedium;
 
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(horizontal: 10),
         child: SizedBox(
           width: double.infinity,
           child: Row(
             children: [
               Icon(Icons.movie_outlined, color: colors.primary),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
               Text('FlixTap', style: titleStyle),
 
-              const Spacer(),
+              Spacer(),
 
-              IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+              IconButton(
+                onPressed: () {
+                  final searchedMovies = ref.read(searchedMoviesProvider);
+                  final searchQuery = ref.read(searchQueryProvider);
+
+                  showSearch<Movie?>(
+                    query: searchQuery,
+                    context: context,
+                    delegate: SearchMovieDelegate(
+                      initialMovies: searchedMovies,
+                      searchMovies: ref
+                          .read(searchedMoviesProvider.notifier)
+                          .searchMoviesByQuery,
+                    ),
+                  ).then((movie) {
+                    if (movie == null) return;
+
+                    if (context.mounted) {
+                      context.push('/movie/${movie.id}');
+                    }
+                  });
+                },
+                icon: Icon(Icons.search),
+              ),
             ],
           ),
         ),

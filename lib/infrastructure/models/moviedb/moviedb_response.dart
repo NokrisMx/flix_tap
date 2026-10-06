@@ -1,4 +1,4 @@
-import 'package:flix_tap/infrastructure/models/moviedb/moviedb_moviedb.dart';
+import 'package:flix_tap/infrastructure/models/moviedb/movie_moviedb.dart';
 
 class MovieDbResponse {
   final Dates? dates;
