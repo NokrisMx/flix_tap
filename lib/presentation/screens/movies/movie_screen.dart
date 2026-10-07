@@ -1,4 +1,4 @@
-import 'package:flix_tap/presentation/providers/actors/actors_by_movie_provider.dart';
+import 'package:flix_tap/config/helpers/human_formats.dart';
 import 'package:flix_tap/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,8 +93,56 @@ class _MovieDetails extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(movie.title, style: textStyles.titleLarge),
-                    Text(movie.overview),
+                    SizedBox(
+                      width: (size.width - 40) * 0.7,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(movie.title, style: textStyles.titleLarge),
+
+                          SizedBox(height: 8),
+
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star_half_outlined,
+                                color: Colors.yellow.shade800,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                HumanFormats.number(movie.voteAverage, 1),
+                                style: textStyles.bodyMedium?.copyWith(
+                                  color: Colors.yellow.shade800,
+                                ),
+                              ),
+
+                              Spacer(),
+
+                              Text(
+                                HumanFormats.number(movie.popularity),
+                                style: textStyles.bodySmall,
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 8),
+
+                          Text(
+                            'Estreno: ${HumanFormats.date(movie.releaseDate)}',
+                            style: textStyles.bodySmall,
+                          ),
+
+                          Text(
+                            'Idioma original: ${movie.originalLanguage.toUpperCase()}',
+                            style: textStyles.bodySmall,
+                          ),
+
+                          SizedBox(height: 8),
+
+                          Text(movie.overview),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

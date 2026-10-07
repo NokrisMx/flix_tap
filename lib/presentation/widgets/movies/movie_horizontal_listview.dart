@@ -129,7 +129,7 @@ class _Slide extends StatelessWidget {
                 Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
                 SizedBox(width: 3),
                 Text(
-                  '${movie.voteAverage}',
+                  HumanFormats.number(movie.voteAverage, 1),
                   style: textStyles.bodyMedium?.copyWith(
                     color: Colors.yellow.shade800,
                   ),

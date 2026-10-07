@@ -10,4 +10,8 @@ class HumanFormats {
 
     return formattedNumber;
   }
+
+  static String date(DateTime date) {
+    return DateFormat('dd/MM/yyyy', 'es_MX').format(date);
+  }
 }
