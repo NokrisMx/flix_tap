@@ -1,8 +1,11 @@
 import 'package:flix_tap/config/helpers/human_formats.dart';
+import 'package:flix_tap/domain/entities/video.dart';
 import 'package:flix_tap/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flix_tap/domain/entities/movie.dart';
 
@@ -170,6 +173,8 @@ class _MovieDetails extends ConsumerWidget {
           ),
         ),
 
+        _MovieTrailer(movieId: movie.id.toString()),
+
         //Actores
         _ActorsByMovie(movieId: movie.id.toString()),
 
@@ -186,6 +191,146 @@ class _MovieDetails extends ConsumerWidget {
         SizedBox(height: 50),
       ],
     );
+  }
+}
+
+class _MovieTrailer extends ConsumerWidget {
+  final String movieId;
+
+  const _MovieTrailer({required this.movieId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final videosAsync = ref.watch(videosByMovieProvider(movieId));
+
+    return videosAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(16),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      error: (error, stackTrace) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: [
+            const Expanded(child: Text('No se pudieron cargar los tráileres.')),
+            IconButton(
+              tooltip: 'Reintentar',
+              onPressed: () => ref.invalidate(videosByMovieProvider(movieId)),
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+      ),
+      data: (video) {
+        final videos =
+            video.results
+                .where(
+                  (result) =>
+                      result.site.toLowerCase() == 'youtube' &&
+                      result.key.isNotEmpty &&
+                      ['trailer', 'teaser'].contains(result.type.toLowerCase()),
+                )
+                .toList()
+              ..sort(_compareVideos);
+
+        if (videos.isEmpty) return const SizedBox.shrink();
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: OutlinedButton.icon(
+            onPressed: () => _showVideoPicker(context, videos),
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('Ver tráiler'),
+          ),
+        );
+      },
+    );
+  }
+
+  int _compareVideos(VideoResult first, VideoResult second) {
+    var comparison = (second.official ? 1 : 0).compareTo(
+      first.official ? 1 : 0,
+    );
+    if (comparison != 0) return comparison;
+
+    int languagePriority(VideoResult video) {
+      if (video.iso6391 == 'es' && video.iso31661 == 'MX') return 2;
+      if (video.iso6391 == 'es') return 1;
+      return 0;
+    }
+
+    comparison = languagePriority(second).compareTo(languagePriority(first));
+    if (comparison != 0) return comparison;
+
+    comparison = (second.type.toLowerCase() == 'trailer' ? 1 : 0).compareTo(
+      first.type.toLowerCase() == 'trailer' ? 1 : 0,
+    );
+    if (comparison != 0) return comparison;
+
+    return second.publishedAt.compareTo(first.publishedAt);
+  }
+
+  void _showVideoPicker(BuildContext context, List<VideoResult> videos) {
+    final messenger = ScaffoldMessenger.of(context);
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                'Selecciona un tráiler',
+                style: Theme.of(sheetContext).textTheme.titleLarge,
+              ),
+            ),
+            ...videos.map(
+              (video) => ListTile(
+                leading: const Icon(Icons.play_circle_outline),
+                title: Text(video.name),
+                subtitle: Text(
+                  '${video.type}${video.official ? ' · Oficial' : ''} · '
+                  '${video.iso6391.toUpperCase()}'
+                  '${video.iso31661.isNotEmpty ? '-${video.iso31661}' : ''}',
+                ),
+                onTap: () async {
+                  Navigator.pop(sheetContext);
+                  await _openYouTube(video.key, messenger);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openYouTube(
+    String videoKey,
+    ScaffoldMessengerState messenger,
+  ) async {
+    final videoUri = Uri.https('www.youtube.com', '/watch', {'v': videoKey});
+
+    try {
+      final launched = await launchUrl(
+        videoUri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched && messenger.mounted) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir YouTube.')),
+        );
+      }
+    } on PlatformException {
+      if (messenger.mounted) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir YouTube.')),
+        );
+      }
+    }
   }
 }
 
