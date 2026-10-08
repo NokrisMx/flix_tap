@@ -16,6 +16,8 @@ class PersonMapper {
     name: pr.name,
     placeOfBirth: pr.placeOfBirth,
     popularity: pr.popularity,
-    profilePath: pr.profilePath,
+    profilePath: pr.profilePath.isNotEmpty
+        ? 'https://image.tmdb.org/t/p/w500${pr.profilePath}'
+        : '',
   );
 }

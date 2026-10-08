@@ -15,6 +15,12 @@ final appRouter = GoRouter(
           builder: (context, state) =>
               MovieScreen(movieId: state.pathParameters['id']!),
         ),
+        GoRoute(
+          path: 'person/:id',
+          name: PersonScreen.name,
+          builder: (context, state) =>
+              PersonScreen(personId: state.pathParameters['id']!),
+        ),
       ],
     ),
   ],
