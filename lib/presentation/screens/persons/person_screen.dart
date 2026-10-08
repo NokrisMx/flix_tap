@@ -103,7 +103,12 @@ class _PersonSliverAppBar extends StatelessWidget {
       expandedHeight: size.height * 0.62,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(person.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Text(
+          person.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white),
+        ),
         titlePadding: const EdgeInsets.symmetric(horizontal: 56, vertical: 12),
         background: Stack(
           fit: StackFit.expand,
@@ -122,11 +127,22 @@ class _PersonSliverAppBar extends StatelessWidget {
                   return FadeIn(child: child);
                 },
                 errorBuilder: (context, error, stackTrace) =>
-                    const _PersonImagePlaceholder(),
+                    _PersonImagePlaceholder(),
               )
             else
-              const _PersonImagePlaceholder(),
-            const DecoratedBox(
+              _PersonImagePlaceholder(),
+            SizedBox.expand(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    stops: [0.0, 0.3],
+                    colors: [Colors.black87, Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
