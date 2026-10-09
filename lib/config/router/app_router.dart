@@ -2,61 +2,48 @@ import 'package:flix_tap/presentation/screens/screens.dart';
 import 'package:flix_tap/presentation/views/views.dart';
 import 'package:go_router/go_router.dart';
 
-final appRouter = GoRouter(
+final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   routes: [
-    ShellRoute(
-      builder: (context, state, child) {
-        return HomeScreen(childView: child);
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return HomeScreen(navigationShell: navigationShell);
       },
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) {
-            return HomeView();
-          },
+      branches: [
+        // Rama 0: Inicio
+        StatefulShellBranch(
           routes: [
             GoRoute(
-              path: 'movie/:id',
-              name: MovieScreen.name,
-              builder: (context, state) =>
-                  MovieScreen(movieId: state.pathParameters['id']!),
-            ),
-            GoRoute(
-              path: 'person/:id',
-              name: PersonScreen.name,
-              builder: (context, state) =>
-                  PersonScreen(personId: state.pathParameters['id']!),
+              path: '/',
+              builder: (context, state) => HomeView(),
+              routes: [
+                GoRoute(
+                  path: 'movie/:id',
+                  name: MovieScreen.name,
+                  builder: (context, state) =>
+                      MovieScreen(movieId: state.pathParameters['id']!),
+                ),
+                GoRoute(
+                  path: 'person/:id',
+                  name: PersonScreen.name,
+                  builder: (context, state) =>
+                      PersonScreen(personId: state.pathParameters['id']!),
+                ),
+              ],
             ),
           ],
         ),
-        GoRoute(
-          path: '/favorites',
-          builder: (context, state) {
-            return FavoritesView();
-          },
+
+        // Rama 1: Favoritos
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/favorites',
+              builder: (context, state) => FavoritesView(),
+            ),
+          ],
         ),
       ],
     ),
-    //* Rutas padre/hijo
-    // GoRoute(
-    //   path: '/',
-    //   name: HomeScreen.name,
-    //   builder: (context, state) => const HomeScreen(childView: FavoritesView()),
-    //   routes: [
-    // GoRoute(
-    //   path: 'movie/:id',
-    //   name: MovieScreen.name,
-    //   builder: (context, state) =>
-    //       MovieScreen(movieId: state.pathParameters['id']!),
-    // ),
-    // GoRoute(
-    //   path: 'person/:id',
-    //   name: PersonScreen.name,
-    //   builder: (context, state) =>
-    //       PersonScreen(personId: state.pathParameters['id']!),
-    // ),
-    //   ],
-    // ),
   ],
 );
