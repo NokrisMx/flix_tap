@@ -7,8 +7,11 @@ import 'package:flix_tap/config/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await dotenv.load(fileName: '.env');
+
   await initializeDateFormatting('es_MX');
+
   runApp(const ProviderScope(child: MainApp()));
 }
 
