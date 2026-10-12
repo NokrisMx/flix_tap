@@ -42,17 +42,29 @@ class _MovieMasonryState extends State<MovieMasonry> {
     if (widget.loadNextPage == null) return;
 
     isLoading = true;
-
-    final movies = await widget.loadNextPage!();
-    isLoading = false;
-
-    if (movies.isEmpty) {
-      isLastPage = true;
+    try {
+      final movies = await widget.loadNextPage!();
+      if (movies.isEmpty) {
+        isLastPage = true;
+      }
+    } finally {
+      isLoading = false;
+      if (mounted) setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !scrollController.hasClients || isLoading || isLastPage) {
+        return;
+      }
+
+      if (scrollController.position.extentAfter <= 200) {
+        loadNextPageMovies();
+      }
+    });
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: MasonryGridView.count(

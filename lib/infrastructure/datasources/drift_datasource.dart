@@ -29,6 +29,7 @@ class DriftDatasource extends LocalStorageDatasource {
   }) async {
     // Query
     final query = database.select(database.favoriteMovies)
+      ..orderBy([(table) => drift.OrderingTerm.asc(table.id)])
       ..limit(limit, offset: offset);
 
     // Ejecutar el query
