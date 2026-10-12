@@ -1,5 +1,6 @@
 import 'package:flix_tap/config/helpers/human_formats.dart';
 import 'package:flix_tap/domain/entities/video.dart';
+import 'package:flix_tap/presentation/providers/storage/is_favorite_movie_provider.dart';
 import 'package:flix_tap/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -415,23 +416,39 @@ class _ActorsByMovie extends ConsumerWidget {
   }
 }
 
-class _CustomSliverAppBar extends StatelessWidget {
+class _CustomSliverAppBar extends ConsumerWidget {
   final Movie movie;
 
   const _CustomSliverAppBar({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
+    final isFavoriteFuture = ref.watch(isFavoriteMovieProvider(movie.id));
 
     return SliverAppBar(
       backgroundColor: Colors.black,
       expandedHeight: size.height * 0.7,
       foregroundColor: Colors.white,
+
       actions: [
         IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.favorite, color: Colors.red),
+          onPressed: () async {
+            await ref
+                .read(favoriteMoviesProvider.notifier)
+                .toggleFavoriteMovie(movie);
+            ref.invalidate(isFavoriteMovieProvider(movie.id));
+          },
+          icon: isFavoriteFuture.when(
+            data: (isFavorite) => isFavorite
+                ? const Icon(Icons.favorite, color: Colors.red)
+                : const Icon(Icons.favorite_border_outlined),
+            error: (_, _) =>
+                throw Exception('Error al cargar el estado de favoritos'),
+            loading: () => const CircularProgressIndicator(strokeWidth: 2),
+          ),
+          // icon: const Icon(Icons.favorite_border_outlined),
+          // icon: const Icon(Icons.favorite, color: Colors.red),
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
