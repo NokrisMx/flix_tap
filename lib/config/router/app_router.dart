@@ -34,7 +34,17 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
 
-        // Rama 1: Favoritos
+        // Rama 1: Categorias
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/categories',
+              builder: (context, state) => CategoriesView(),
+            ),
+          ],
+        ),
+
+        // Rama 2: Favoritos
         StatefulShellBranch(
           routes: [
             GoRoute(
