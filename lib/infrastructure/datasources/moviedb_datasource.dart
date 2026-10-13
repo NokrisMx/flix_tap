@@ -99,4 +99,19 @@ class MoviedbDatasource extends MoviesDatasource {
     );
     return _jsonToMovies(response.data);
   }
+
+  @override
+  Future<List<Movie>> getMovieByCategory({
+    required String categoryId,
+    int page = 1,
+  }) async {
+    final response = await dio.get(
+      '/discover/movie',
+      queryParameters: {'page': page, 'with_genres': categoryId},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Category with id $categoryId not found');
+    }
+    return _jsonToMovies(response.data);
+  }
 }
