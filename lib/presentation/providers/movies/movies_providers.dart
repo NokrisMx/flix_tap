@@ -41,6 +41,22 @@ final similarMoviesProvider =
       );
     });
 
+final moviesByCategoryProvider =
+    StateNotifierProvider.family<SimilarMoviesNotifier, List<Movie>, String>((
+      ref,
+      categoryId,
+    ) {
+      final fetchMoviesByCategory = ref
+          .watch(movieRepositoryProvider)
+          .getMovieByCategory;
+
+      return SimilarMoviesNotifier(
+        movieId: categoryId,
+        fetchMoreMovies: ({required String id, int page = 1}) =>
+            fetchMoviesByCategory(categoryId: id, page: page),
+      );
+    });
+
 typedef MovieCallback = Future<List<Movie>> Function({int page});
 
 class MoviesNotifier extends StateNotifier<List<Movie>> {
