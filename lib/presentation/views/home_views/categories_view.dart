@@ -1,6 +1,7 @@
 import 'package:flix_tap/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoriesView extends ConsumerWidget {
   const CategoriesView({super.key});
@@ -50,13 +51,18 @@ class CategoriesView extends ConsumerWidget {
 
                   return Card(
                     color: colors.primaryContainer,
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Text(
-                          category.name,
-                          textAlign: TextAlign.center,
-                          style: textTheme.titleMedium,
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () =>
+                          context.push('/categories/${category.id}'),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Text(
+                            category.name,
+                            textAlign: TextAlign.center,
+                            style: textTheme.titleMedium,
+                          ),
                         ),
                       ),
                     ),

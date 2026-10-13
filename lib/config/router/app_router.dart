@@ -40,6 +40,14 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/categories',
               builder: (context, state) => CategoriesView(),
+              routes: [
+                GoRoute(
+                  path: ':categoryId',
+                  builder: (context, state) => MoviesByCategoryView(
+                    categoryId: state.pathParameters['categoryId']!,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
