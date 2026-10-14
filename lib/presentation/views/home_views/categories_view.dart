@@ -41,8 +41,7 @@ class CategoriesView extends ConsumerWidget {
       loadingTitle: 'Preparando categorías',
       loadingSubtitle: 'Estamos buscando películas para explorar.',
       errorTitle: 'No se pudieron cargar las categorías',
-      onRetry: () =>
-          ref.read(initialLoadingProvider(request).notifier).retry(),
+      onRetry: () => ref.read(initialLoadingProvider(request).notifier).retry(),
       builder: (context) {
         final categories = categoriesAsync.requireValue;
 
@@ -57,7 +56,17 @@ class CategoriesView extends ConsumerWidget {
 
         return CustomScrollView(
           slivers: [
-            const SliverAppBar(floating: true, title: Text('Categorías')),
+            const SliverAppBar(
+              floating: true,
+              title: Text(
+                'Categorías',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w900,
+                  fontSize: 24,
+                ),
+              ),
+            ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
               sliver: SliverGrid(

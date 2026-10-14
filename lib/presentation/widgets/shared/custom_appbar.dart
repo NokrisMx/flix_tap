@@ -10,7 +10,6 @@ class CustomAppbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = Theme.of(context).colorScheme;
     final titleStyle = Theme.of(context).textTheme.titleMedium;
 
     return SafeArea(
@@ -21,20 +20,31 @@ class CustomAppbar extends ConsumerWidget {
           width: double.infinity,
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: colors.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/icon/icon_2.png',
+                  width: 42,
+                  height: 42,
+                  fit: BoxFit.cover,
                 ),
-                child: Icon(Icons.movie_outlined, color: colors.primary),
               ),
               const SizedBox(width: 10),
-              Text(
-                'FlixTap',
-                style: titleStyle?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
+              Text.rich(
+                TextSpan(
+                  style: titleStyle?.copyWith(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 24,
+                    letterSpacing: 0.2,
+                  ),
+                  children: const [
+                    TextSpan(text: 'Flix'),
+                    TextSpan(
+                      text: 'Tap',
+                      style: TextStyle(color: Color(0xFFF98B6A)),
+                    ),
+                  ],
                 ),
               ),
 

@@ -26,7 +26,17 @@ class FavoritesView extends ConsumerWidget {
 
           return CustomScrollView(
             slivers: [
-              const SliverAppBar(floating: true, title: Text('Favoritos')),
+              const SliverAppBar(
+                floating: true,
+                title: Text(
+                  'Favoritos',
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
@@ -54,7 +64,17 @@ class FavoritesView extends ConsumerWidget {
 
         return CustomScrollView(
           slivers: [
-            const SliverAppBar(floating: true, title: Text('Favoritos')),
+            const SliverAppBar(
+              floating: true,
+              title: Text(
+                'Favoritos',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w900,
+                  fontSize: 24,
+                ),
+              ),
+            ),
             MovieMasonry(
               asSliver: true,
               movies: movies,

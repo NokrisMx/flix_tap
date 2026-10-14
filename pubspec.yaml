@@ -35,19 +35,29 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon/icon_2.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 flutter_native_splash:
   color: "081A2F"
+  image: assets/icon/icon_1.png
 
   android_12:
     color: "081A2F"
+    image: assets/icon/icon_1.png
+    icon_background_color: "081A2F"
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Black.ttf
+          weight: 900
 
   assets:
     - .env
     - assets/images/categories/
     - assets/icon/
+    - assets/fonts/
