@@ -15,15 +15,19 @@ class CustomBottomNavigation extends StatelessWidget {
         navigationShell.goBranch(index);
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_max), label: 'Inicio'),
-
         BottomNavigationBarItem(
-          icon: Icon(Icons.label_outline),
-          label: 'Categorías',
+          icon: Icon(Icons.movie_outlined),
+          activeIcon: Icon(Icons.movie_rounded),
+          label: 'Explorar',
         ),
-
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_outline),
+          icon: Icon(Icons.category_outlined),
+          activeIcon: Icon(Icons.category_rounded),
+          label: 'Géneros',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite_border_rounded),
+          activeIcon: Icon(Icons.favorite_rounded),
           label: 'Favoritos',
         ),
       ],

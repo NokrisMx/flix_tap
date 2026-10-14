@@ -62,113 +62,103 @@ class _MovieDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final size = MediaQuery.of(context).size;
-    final textStyles = Theme.of(context).textTheme;
-
     final similarMovies = ref.watch(similarMoviesProvider(movie.id.toString()));
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.all(8),
-          child: Row(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Imagen
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(movie.posterPath, width: size.width * 0.3),
-              ),
-
-              SizedBox(width: 10),
-
-              // Descripción
-              SizedBox(
-                width: (size.width - 40) * 0.7,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: (size.width - 40) * 0.7,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(movie.title, style: textStyles.titleLarge),
-
-                          SizedBox(height: 8),
-
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.star_half_outlined,
-                                color: Colors.yellow.shade800,
-                              ),
-                              SizedBox(width: 3),
-                              Text(
-                                HumanFormats.number(movie.voteAverage, 1),
-                                style: textStyles.bodyMedium?.copyWith(
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-
-                              Spacer(),
-
-                              Text(
-                                HumanFormats.number(movie.popularity),
-                                style: textStyles.bodySmall,
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            'Estreno: ${HumanFormats.date(movie.releaseDate)}',
-                            style: textStyles.bodySmall,
-                          ),
-
-                          Text(
-                            'Idioma original: ${movie.originalLanguage.toUpperCase()}',
-                            style: textStyles.bodySmall,
-                          ),
-
-                          SizedBox(height: 8),
-
-                          Text(movie.overview),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Generos de la película
-        Padding(
-          padding: EdgeInsets.all(8),
-          child: Wrap(
-            children: [
-              ...movie.genreIds.map(
-                (gender) => Container(
-                  margin: EdgeInsets.only(right: 10),
-                  child: Chip(
-                    label: Text(gender),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+              Text(movie.title, style: textTheme.headlineSmall),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _MovieMetricCard(
+                      icon: Icons.star_rounded,
+                      label: 'CALIFICACIÓN',
+                      value: HumanFormats.number(movie.voteAverage, 1),
+                      detail:
+                          '${HumanFormats.number(movie.voteCount.toDouble())} votos',
+                      color: Colors.amber,
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _MovieMetricCard(
+                      icon: Icons.trending_up_rounded,
+                      label: 'POPULARIDAD',
+                      value: HumanFormats.number(movie.popularity, 1),
+                      color: colors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _MovieInfoCard(
+                      icon: Icons.calendar_month_rounded,
+                      label: 'ESTRENO',
+                      value: HumanFormats.date(movie.releaseDate),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _MovieInfoCard(
+                      icon: Icons.language_rounded,
+                      label: 'IDIOMA ORIGINAL',
+                      value: movie.originalLanguage.toUpperCase(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _MovieSectionTitle(icon: Icons.subject_rounded, title: 'Resumen'),
+              const SizedBox(height: 10),
+              Text(
+                movie.overview,
+                style: textTheme.bodyLarge?.copyWith(
+                  height: 1.55,
+                  color: colors.onSurfaceVariant,
                 ),
               ),
+              const SizedBox(height: 24),
+              _MovieSectionTitle(
+                icon: Icons.local_offer_outlined,
+                title: 'Géneros',
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: movie.genreIds
+                    .map(
+                      (genre) => Chip(
+                        avatar: Icon(
+                          Icons.movie_filter_outlined,
+                          size: 16,
+                          color: colors.primary,
+                        ),
+                        label: Text(genre),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 12),
             ],
           ),
         ),
 
         _MovieTrailer(movieId: movie.id.toString()),
 
-        //Actores
+        const SizedBox(height: 24),
         _ActorsByMovie(movieId: movie.id.toString()),
 
         if (similarMovies.isNotEmpty)
@@ -181,7 +171,135 @@ class _MovieDetails extends ConsumerWidget {
                 .loadNextPage(),
           ),
 
-        SizedBox(height: 50),
+        const SizedBox(height: 50),
+      ],
+    );
+  }
+}
+
+class _MovieMetricCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final String? detail;
+  final Color color;
+
+  const _MovieMetricCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.detail,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: color),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelSmall?.copyWith(
+                      letterSpacing: 0.6,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              value,
+              style: textTheme.titleLarge?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            if (detail != null) ...[
+              const SizedBox(height: 2),
+              Text(detail!, style: textTheme.bodySmall),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MovieInfoCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _MovieInfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 20, color: colors.primary),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.labelSmall?.copyWith(
+                letterSpacing: 0.4,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.titleSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MovieSectionTitle extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
+  const _MovieSectionTitle({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: colors.primary),
+        const SizedBox(width: 8),
+        Text(title, style: Theme.of(context).textTheme.titleMedium),
       ],
     );
   }
@@ -198,11 +316,11 @@ class _MovieTrailer extends ConsumerWidget {
 
     return videosAsync.when(
       loading: () => const Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
       error: (error, stackTrace) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
             const Expanded(child: Text('No se pudieron cargar los tráileres.')),
@@ -229,11 +347,17 @@ class _MovieTrailer extends ConsumerWidget {
         if (videos.isEmpty) return const SizedBox.shrink();
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: OutlinedButton.icon(
-            onPressed: () => _showVideoPicker(context, videos),
-            icon: const Icon(Icons.play_arrow),
-            label: const Text('Ver tráiler'),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => _showVideoPicker(context, videos),
+              icon: const Icon(Icons.play_circle_outline_rounded),
+              label: const Text('Ver tráiler'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
           ),
         );
       },
@@ -420,7 +544,7 @@ class _CustomSliverAppBar extends ConsumerWidget {
 
     return SliverAppBar(
       backgroundColor: backgroundColor,
-      expandedHeight: size.height * 0.7,
+      expandedHeight: size.height * 0.55,
       foregroundColor: Theme.of(context).colorScheme.onSurface,
 
       actions: [

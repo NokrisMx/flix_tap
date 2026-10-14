@@ -38,9 +38,9 @@ class CategoriesView extends ConsumerWidget {
 
     return InitialLoadView(
       state: loadState,
-      loadingTitle: 'Preparando categorías',
+      loadingTitle: 'Preparando géneros',
       loadingSubtitle: 'Estamos buscando películas para explorar.',
-      errorTitle: 'No se pudieron cargar las categorías',
+      errorTitle: 'No se pudieron cargar géneros',
       onRetry: () => ref.read(initialLoadingProvider(request).notifier).retry(),
       builder: (context) {
         final categories = categoriesAsync.requireValue;
@@ -48,7 +48,7 @@ class CategoriesView extends ConsumerWidget {
         if (categories.isEmpty) {
           return const FullScreenLoader(
             icon: Icons.category_outlined,
-            title: 'Aún no hay categorías',
+            title: 'Aún no hay géneros',
             subtitle: 'Vuelve más tarde para descubrir nuevos géneros.',
             isLoading: false,
           );
@@ -59,7 +59,7 @@ class CategoriesView extends ConsumerWidget {
             const SliverAppBar(
               floating: true,
               title: Text(
-                'Categorías',
+                'Géneros',
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
@@ -82,7 +82,7 @@ class CategoriesView extends ConsumerWidget {
                   maxCrossAxisExtent: 260,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.95,
+                  childAspectRatio: 1.05,
                 ),
               ),
             ),
@@ -107,59 +107,153 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
 
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (imagePath != null)
-                    Image.asset(
-                      imagePath!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const ColoredBox(color: Colors.grey),
-                    ),
-                ],
+            if (imagePath != null)
+              Image.asset(
+                imagePath!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _CategoryImagePlaceholder(color: colors.primaryContainer),
+              )
+            else
+              _CategoryImagePlaceholder(color: colors.primaryContainer),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x33000000),
+                    Color(0x08000000),
+                    Color(0xE6000000),
+                  ],
+                  stops: [0, 0.35, 1],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Positioned(
+            //   top: 12,
+            //   left: 12,
+            //   child: DecoratedBox(
+            //     decoration: BoxDecoration(
+            //       color: colors.surface.withValues(alpha: 0.78),
+            //       borderRadius: BorderRadius.circular(20),
+            //       border: Border.all(
+            //         color: colors.onSurface.withValues(alpha: 0.12),
+            //       ),
+            //     ),
+            //     child: Padding(
+            //       padding: const EdgeInsets.symmetric(
+            //         horizontal: 10,
+            //         vertical: 6,
+            //       ),
+            //       child: Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           Icon(
+            //             Icons.movie_filter_outlined,
+            //             size: 14,
+            //             color: colors.primary,
+            //           ),
+            //           const SizedBox(width: 5),
+            //           Text(
+            //             'GÉNERO',
+            //             style: textTheme.labelSmall?.copyWith(
+            //               color: colors.onSurface,
+            //               fontWeight: FontWeight.w700,
+            //               letterSpacing: 0.6,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            Positioned(
+              left: 14,
+              right: 12,
+              bottom: 14,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    category.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          category.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            height: 1.1,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black54,
+                                blurRadius: 8,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Explorar películas',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Explorar',
-                        style: textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Icon(Icons.arrow_forward_rounded, size: 20),
-                    ],
+                  const SizedBox(width: 8),
+
+                  SizedBox(
+                    width: 34,
+                    height: 34,
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 19,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryImagePlaceholder extends StatelessWidget {
+  final Color color;
+
+  const _CategoryImagePlaceholder({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: color,
+      child: Center(
+        child: Icon(
+          Icons.local_movies_outlined,
+          size: 44,
+          color: Theme.of(context).colorScheme.onPrimaryContainer,
         ),
       ),
     );
