@@ -1,13 +1,15 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flix_tap/config/helpers/human_formats.dart';
 import 'package:flix_tap/domain/entities/person.dart';
+import 'package:flix_tap/presentation/providers/movies/initial_loading_provider.dart';
 import 'package:flix_tap/presentation/providers/persons/persons_provider.dart';
+import 'package:flix_tap/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PersonScreen extends ConsumerStatefulWidget {
+class PersonScreen extends ConsumerWidget {
   static const name = 'person-screen';
 
   final String personId;
@@ -15,75 +17,29 @@ class PersonScreen extends ConsumerStatefulWidget {
   const PersonScreen({super.key, required this.personId});
 
   @override
-  PersonScreenState createState() => PersonScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final request = InitialLoadRequest.person(personId);
+    final loadState = ref.watch(initialLoadingProvider(request));
 
-class PersonScreenState extends ConsumerState<PersonScreen> {
-  Object? _loadError;
+    return InitialLoadView(
+      state: loadState,
+      loadingTitle: 'Cargando persona',
+      loadingSubtitle: 'Preparando su información.',
+      errorTitle: 'No se pudo cargar la información',
+      onRetry: () => ref.read(initialLoadingProvider(request).notifier).retry(),
+      builder: (context) {
+        final Person person = ref.watch(personInfoProvider)[personId]!;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadPerson();
-  }
-
-  @override
-  void didUpdateWidget(covariant PersonScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.personId != widget.personId) {
-      _loadError = null;
-      _loadPerson();
-    }
-  }
-
-  Future<void> _loadPerson({bool isRetry = false}) async {
-    if (isRetry) {
-      setState(() => _loadError = null);
-    }
-
-    final personId = widget.personId;
-    try {
-      await ref.read(personInfoProvider.notifier).loadPerson(personId);
-    } catch (error) {
-      if (!mounted || personId != widget.personId) return;
-      setState(() => _loadError = error);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final person = ref.watch(personInfoProvider)[widget.personId];
-
-    if (person == null) {
-      return Scaffold(
-        body: Center(
-          child: _loadError == null
-              ? const CircularProgressIndicator(strokeWidth: 2)
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('No se pudo cargar la información.'),
-                    const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: () => _loadPerson(isRetry: true),
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Reintentar'),
-                    ),
-                  ],
-                ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const ClampingScrollPhysics(),
-        slivers: [
-          _PersonSliverAppBar(person: person),
-          SliverToBoxAdapter(child: _PersonDetails(person: person)),
-        ],
-      ),
+        return Scaffold(
+          body: CustomScrollView(
+            physics: const ClampingScrollPhysics(),
+            slivers: [
+              _PersonSliverAppBar(person: person),
+              SliverToBoxAdapter(child: _PersonDetails(person: person)),
+            ],
+          ),
+        );
+      },
     );
   }
 }

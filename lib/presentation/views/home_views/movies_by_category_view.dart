@@ -1,48 +1,23 @@
 import 'package:flix_tap/presentation/providers/providers.dart';
-import 'package:flix_tap/presentation/widgets/movies/movies_masonry.dart';
+import 'package:flix_tap/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MoviesByCategoryView extends ConsumerStatefulWidget {
+class MoviesByCategoryView extends ConsumerWidget {
   final String categoryId;
 
   const MoviesByCategoryView({super.key, required this.categoryId});
 
   @override
-  ConsumerState<MoviesByCategoryView> createState() =>
-      _MoviesByCategoryViewState();
-}
-
-class _MoviesByCategoryViewState extends ConsumerState<MoviesByCategoryView> {
-  bool _isLoading = true;
-  Object? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMovies();
-  }
-
-  Future<void> _loadMovies() async {
-    try {
-      await ref
-          .read(moviesByCategoryProvider(widget.categoryId).notifier)
-          .loadNextPage();
-    } catch (error) {
-      if (mounted) setState(() => _error = error);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final movies = ref.watch(moviesByCategoryProvider(widget.categoryId));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final request = InitialLoadRequest.categoryMovies(categoryId);
+    final loadState = ref.watch(initialLoadingProvider(request));
+    final movies = ref.watch(moviesByCategoryProvider(categoryId));
     final categoriesAsync = ref.watch(categoriesProvider);
     final categoryName = categoriesAsync.maybeWhen(
       data: (categories) {
         for (final category in categories) {
-          if (category.id.toString() == widget.categoryId) {
+          if (category.id.toString() == categoryId) {
             return category.name;
           }
         }
@@ -53,41 +28,25 @@ class _MoviesByCategoryViewState extends ConsumerState<MoviesByCategoryView> {
 
     return Scaffold(
       appBar: AppBar(title: Text(categoryName)),
-      body: _error != null
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('No se pudieron cargar las películas'),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _error = null;
-                        _isLoading = true;
-                      });
-                      ref.invalidate(
-                        moviesByCategoryProvider(widget.categoryId),
-                      );
-                      _loadMovies();
-                    },
-                    child: const Text('Reintentar'),
-                  ),
-                ],
+      body: InitialLoadView(
+        state: loadState,
+        loadingTitle: 'Cargando películas',
+        loadingSubtitle: 'Buscando películas de esta categoría.',
+        errorTitle: 'No se pudieron cargar las películas',
+        onRetry: () =>
+            ref.read(initialLoadingProvider(request).notifier).retry(),
+        builder: (context) => movies.isEmpty
+            ? const Center(child: Text('No hay películas en esta categoría'))
+            : MovieMasonry(
+                movies: movies,
+                loadNextPage: () async {
+                  await ref
+                      .read(moviesByCategoryProvider(categoryId).notifier)
+                      .loadNextPage();
+                  return ref.read(moviesByCategoryProvider(categoryId));
+                },
               ),
-            )
-          : _isLoading && movies.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : movies.isEmpty
-          ? const Center(child: Text('No hay películas en esta categoría'))
-          : MovieMasonry(
-              movies: movies,
-              loadNextPage: () async {
-                await ref
-                    .read(moviesByCategoryProvider(widget.categoryId).notifier)
-                    .loadNextPage();
-                return ref.read(moviesByCategoryProvider(widget.categoryId));
-              },
-            ),
+      ),
     );
   }
 }

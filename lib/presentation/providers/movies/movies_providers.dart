@@ -70,12 +70,14 @@ class MoviesNotifier extends StateNotifier<List<Movie>> {
     if (isLoading) return;
     isLoading = true;
 
-    currentPage++;
-    final List<Movie> newMovies = await fetchMoreMovies(page: currentPage);
-    state = [...state, ...newMovies];
-
-    await Future.delayed(Duration(milliseconds: 300));
-    isLoading = false;
+    final nextPage = currentPage + 1;
+    try {
+      final newMovies = await fetchMoreMovies(page: nextPage);
+      currentPage = nextPage;
+      state = [...state, ...newMovies];
+    } finally {
+      isLoading = false;
+    }
   }
 }
 
@@ -98,13 +100,13 @@ class SimilarMoviesNotifier extends StateNotifier<List<Movie>> {
     if (isLoading) return;
 
     isLoading = true;
-
-    currentPage++;
-
-    final newMovies = await fetchMoreMovies(id: movieId, page: currentPage);
-
-    state = [...state, ...newMovies];
-
-    isLoading = false;
+    final nextPage = currentPage + 1;
+    try {
+      final newMovies = await fetchMoreMovies(id: movieId, page: nextPage);
+      currentPage = nextPage;
+      state = [...state, ...newMovies];
+    } finally {
+      isLoading = false;
+    }
   }
 }

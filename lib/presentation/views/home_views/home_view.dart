@@ -4,92 +4,81 @@ import 'package:flix_tap/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeView extends ConsumerStatefulWidget {
+class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
-  HomeViewState createState() => HomeViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    const request = InitialLoadRequest.home();
+    final loadState = ref.watch(initialLoadingProvider(request));
 
-class HomeViewState extends ConsumerState<HomeView> {
-  @override
-  void initState() {
-    super.initState();
+    return InitialLoadView(
+      state: loadState,
+      loadingTitle: 'Preparando películas',
+      loadingSubtitle: 'Estamos buscando películas para explorar.',
+      errorTitle: 'No se pudieron cargar las películas',
+      onRetry: () => ref.read(initialLoadingProvider(request).notifier).retry(),
+      builder: (context) {
+        final slideshowMovies = ref.watch(moviesSlideshowProvider);
+        final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+        final popularMovies = ref.watch(popularMoviesProvider);
+        final topRatedMovies = ref.watch(topRatedMoviesProvider);
+        final upcomingMovies = ref.watch(upcomingMoviesProvider);
 
-    ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-    ref.read(popularMoviesProvider.notifier).loadNextPage();
-    ref.read(topRatedMoviesProvider.notifier).loadNextPage();
-    ref.read(upcomingMoviesProvider.notifier).loadNextPage();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final initialLoading = ref.watch(initialLoadingProvider);
-    if (initialLoading) return const FullScreenLoader();
-
-    final slideshowMovies = ref.watch(moviesSlideshowProvider);
-    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
-    final popularMovies = ref.watch(popularMoviesProvider);
-    final topRatedMovies = ref.watch(topRatedMoviesProvider);
-    final upcomingMovies = ref.watch(upcomingMoviesProvider);
-
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          floating: true,
-          flexibleSpace: FlexibleSpaceBar(
-            title: CustomAppbar(),
-            titlePadding: EdgeInsets.all(0),
-          ),
-        ),
-
-        SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-            return Column(
-              children: [
-                //CustomAppbar(),
-
-                MoviesSlideshow(movies: slideshowMovies),
-                SizedBox(height: 10),
-                MovieHorizontalListview(
-                  movies: nowPlayingMovies,
-                  title: 'En cines',
-                  //subTitle: 'En este mes',
-                  loadNextPage: () => ref
-                      .read(nowPlayingMoviesProvider.notifier)
-                      .loadNextPage(),
-                ),
-                SizedBox(height: 10),
-                MovieHorizontalListview(
-                  movies: upcomingMovies,
-                  title: 'Próximamente',
-                  //subTitle: 'Este año',
-                  loadNextPage: () =>
-                      ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
-                ),
-                SizedBox(height: 10),
-                MovieHorizontalListview(
-                  movies: popularMovies,
-                  title: 'Populares',
-                  //subTitle: 'En este mes',
-                  loadNextPage: () =>
-                      ref.read(popularMoviesProvider.notifier).loadNextPage(),
-                ),
-                SizedBox(height: 10),
-                MovieHorizontalListview(
-                  movies: topRatedMovies,
-                  title: 'Mejor calificadas',
-                  //subTitle: 'Desde siempre',
-                  loadNextPage: () =>
-                      ref.read(topRatedMoviesProvider.notifier).loadNextPage(),
-                ),
-
-                SizedBox(height: 10),
-              ],
-            );
-          }, childCount: 1),
-        ),
-      ],
+        return CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              floating: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: CustomAppbar(),
+                titlePadding: EdgeInsets.all(0),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Column(
+                  children: [
+                    MoviesSlideshow(movies: slideshowMovies),
+                    SizedBox(height: 10),
+                    MovieHorizontalListview(
+                      movies: nowPlayingMovies,
+                      title: 'En cines',
+                      loadNextPage: () => ref
+                          .read(nowPlayingMoviesProvider.notifier)
+                          .loadNextPage(),
+                    ),
+                    SizedBox(height: 10),
+                    MovieHorizontalListview(
+                      movies: upcomingMovies,
+                      title: 'Próximamente',
+                      loadNextPage: () => ref
+                          .read(upcomingMoviesProvider.notifier)
+                          .loadNextPage(),
+                    ),
+                    SizedBox(height: 10),
+                    MovieHorizontalListview(
+                      movies: popularMovies,
+                      title: 'Populares',
+                      loadNextPage: () => ref
+                          .read(popularMoviesProvider.notifier)
+                          .loadNextPage(),
+                    ),
+                    SizedBox(height: 10),
+                    MovieHorizontalListview(
+                      movies: topRatedMovies,
+                      title: 'Mejor calificadas',
+                      loadNextPage: () => ref
+                          .read(topRatedMoviesProvider.notifier)
+                          .loadNextPage(),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                );
+              }, childCount: 1),
+            ),
+          ],
+        );
+      },
     );
   }
 }

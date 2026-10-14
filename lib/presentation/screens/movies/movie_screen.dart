@@ -13,8 +13,9 @@ import 'package:flix_tap/domain/entities/movie.dart';
 
 import 'package:flix_tap/presentation/providers/providers.dart';
 import 'package:flix_tap/presentation/providers/movies/movie_info_provider.dart';
+import 'package:flix_tap/presentation/widgets/widgets.dart';
 
-class MovieScreen extends ConsumerStatefulWidget {
+class MovieScreen extends ConsumerWidget {
   static const name = 'movie-screen';
 
   final String movieId;
@@ -22,44 +23,34 @@ class MovieScreen extends ConsumerStatefulWidget {
   const MovieScreen({super.key, required this.movieId});
 
   @override
-  MovieScreenState createState() => MovieScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final request = InitialLoadRequest.movie(movieId);
+    final loadState = ref.watch(initialLoadingProvider(request));
 
-class MovieScreenState extends ConsumerState<MovieScreen> {
-  @override
-  void initState() {
-    super.initState();
+    return InitialLoadView(
+      state: loadState,
+      loadingTitle: 'Cargando película',
+      loadingSubtitle: 'Preparando los detalles de la película.',
+      errorTitle: 'No se pudo cargar la película',
+      onRetry: () => ref.read(initialLoadingProvider(request).notifier).retry(),
+      builder: (context) {
+        final Movie movie = ref.watch(movieInfoProvider)[movieId]!;
 
-    ref.read(movieInfoProvider.notifier).loadMovie(widget.movieId);
-    ref.read(actorsByMovieProvider.notifier).loadActors(widget.movieId);
-    ref
-        .read(similarMoviesProvider(widget.movieId.toString()).notifier)
-        .loadNextPage();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Movie? movie = ref.watch(movieInfoProvider)[widget.movieId];
-
-    if (movie == null) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      );
-    }
-
-    return Scaffold(
-      body: CustomScrollView(
-        physics: ClampingScrollPhysics(),
-        slivers: [
-          _CustomSliverAppBar(movie: movie),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _MovieDetails(movie: movie),
-              childCount: 1,
-            ),
+        return Scaffold(
+          body: CustomScrollView(
+            physics: const ClampingScrollPhysics(),
+            slivers: [
+              _CustomSliverAppBar(movie: movie),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => _MovieDetails(movie: movie),
+                  childCount: 1,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

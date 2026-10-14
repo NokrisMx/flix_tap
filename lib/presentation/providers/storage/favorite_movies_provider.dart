@@ -3,36 +3,42 @@ import 'package:flix_tap/domain/entities/movie.dart';
 import 'package:flix_tap/domain/repositories/local_storage_repository.dart';
 import 'package:flix_tap/presentation/providers/storage/local_storage_provider.dart';
 
-final favoriteMoviesProvider = StateNotifierProvider((ref) {
-  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+final favoriteMoviesProvider =
+    StateNotifierProvider<StorageMoviesNotifier, Map<int, Movie>>((ref) {
+      final localStorageRepository = ref.watch(localStorageRepositoryProvider);
 
-  return StorageMoviesNotifier(localStorageRepository: localStorageRepository);
-});
+      return StorageMoviesNotifier(
+        localStorageRepository: localStorageRepository,
+      );
+    });
 
 class StorageMoviesNotifier extends StateNotifier<Map<int, Movie>> {
   int page = 0;
+  bool isLoading = false;
   final LocalStorageRepository localStorageRepository;
 
   StorageMoviesNotifier({required this.localStorageRepository}) : super({});
 
   Future<List<Movie>> loadNextPage() async {
-    final movies = await localStorageRepository.loadFavoriteMovies(
-      limit: 10,
-      offset: page * 10,
-    );
+    if (isLoading) return [];
+    isLoading = true;
 
-    page++;
+    try {
+      final movies = await localStorageRepository.loadFavoriteMovies(
+        limit: 10,
+        offset: page * 10,
+      );
 
-    final tempMovies = <int, Movie>{};
+      page++;
+      state = {
+        ...state,
+        for (final movie in movies) movie.id: movie,
+      };
 
-    for (final movie in movies) {
-      // state = {...state, movie.id: movie};
-      tempMovies[movie.id] = movie;
+      return movies;
+    } finally {
+      isLoading = false;
     }
-
-    state = {...state, ...tempMovies};
-
-    return movies;
   }
 
   Future<void> toggleFavoriteMovie(Movie movie) async {

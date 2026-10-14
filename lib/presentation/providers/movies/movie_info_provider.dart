@@ -1,4 +1,4 @@
-import 'package:flix_tap/presentation/providers/providers.dart';
+import 'package:flix_tap/presentation/providers/movies/movies_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flix_tap/domain/entities/movie.dart';
 
