@@ -26,6 +26,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
 
     if (myMovieList.isEmpty) {
       return Scaffold(
+        appBar: AppBar(title: Text('Favoritos')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -39,6 +40,7 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
     }
 
     return Scaffold(
+      appBar: AppBar(title: Text('Favoritos')),
       body: MovieMasonry(
         movies: myMovieList,
         loadNextPage: () =>

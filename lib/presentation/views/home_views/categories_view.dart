@@ -44,7 +44,7 @@ class CategoriesView extends ConsumerWidget {
             }
 
             return SliverPadding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final category = categories[index];
@@ -53,8 +53,7 @@ class CategoriesView extends ConsumerWidget {
                     color: colors.primaryContainer,
                     clipBehavior: Clip.antiAlias,
                     child: InkWell(
-                      onTap: () =>
-                          context.push('/categories/${category.id}'),
+                      onTap: () => context.push('/categories/${category.id}'),
                       child: Center(
                         child: Padding(
                           padding: EdgeInsets.all(12),
