@@ -21,31 +21,42 @@ class _FavoritesViewState extends ConsumerState<FavoritesView> {
   Widget build(BuildContext context) {
     final favoriteMovies = ref.watch(favoriteMoviesProvider);
     final myMovieList = favoriteMovies.values.toList();
+    final colors = Theme.of(context).colorScheme;
 
-    final colorPrimary = Theme.of(context).colorScheme.primary;
-
-    if (myMovieList.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: Text('Favoritos')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.favorite_border, size: 100, color: colorPrimary),
-              const Text('No tienes películas favoritas'),
-            ],
+    return CustomScrollView(
+      slivers: [
+        const SliverAppBar(floating: true, title: Text('Favoritos')),
+        if (myMovieList.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.favorite_border_rounded,
+                    size: 72,
+                    color: colors.primary,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No tienes películas favoritas',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          MovieMasonry(
+            asSliver: true,
+            movies: myMovieList,
+            loadNextPage: () =>
+                ref.read(favoriteMoviesProvider.notifier).loadNextPage(),
           ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(title: Text('Favoritos')),
-      body: MovieMasonry(
-        movies: myMovieList,
-        loadNextPage: () =>
-            ref.read(favoriteMoviesProvider.notifier).loadNextPage(),
-      ),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+      ],
     );
   }
 }

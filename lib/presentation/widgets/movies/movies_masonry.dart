@@ -6,8 +6,14 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 class MovieMasonry extends StatefulWidget {
   final List<Movie> movies;
   final Future<List<Movie>> Function()? loadNextPage;
+  final bool asSliver;
 
-  const MovieMasonry({super.key, required this.movies, this.loadNextPage});
+  const MovieMasonry({
+    super.key,
+    required this.movies,
+    this.loadNextPage,
+    this.asSliver = false,
+  });
 
   @override
   State<MovieMasonry> createState() => _MovieMasonryState();
@@ -16,6 +22,7 @@ class MovieMasonry extends StatefulWidget {
 class _MovieMasonryState extends State<MovieMasonry> {
   bool isLastPage = false;
   bool isLoading = false;
+  bool isPageLoadScheduled = false;
   final scrollController = ScrollController();
 
   @override
@@ -53,8 +60,40 @@ class _MovieMasonryState extends State<MovieMasonry> {
     }
   }
 
+  void _scheduleNextPageIfNeeded(int index) {
+    if (index < widget.movies.length - 3 ||
+        isLoading ||
+        isLastPage ||
+        isPageLoadScheduled ||
+        widget.loadNextPage == null) {
+      return;
+    }
+
+    isPageLoadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isPageLoadScheduled = false;
+      if (mounted) loadNextPageMovies();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.asSliver) {
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        sliver: SliverMasonryGrid.count(
+          crossAxisCount: 3,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childCount: widget.movies.length,
+          itemBuilder: (context, index) {
+            _scheduleNextPageIfNeeded(index);
+            return _buildMovieItem(index);
+          },
+        ),
+      );
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !scrollController.hasClients || isLoading || isLastPage) {
         return;
@@ -73,19 +112,21 @@ class _MovieMasonryState extends State<MovieMasonry> {
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
         itemCount: widget.movies.length,
-        itemBuilder: (context, index) {
-          if (index == 1) {
-            return Column(
-              children: [
-                SizedBox(height: 30),
-                MoviePosterLink(movie: widget.movies[index]),
-              ],
-            );
-          }
-
-          return MoviePosterLink(movie: widget.movies[index]);
-        },
+        itemBuilder: (context, index) => _buildMovieItem(index),
       ),
     );
+  }
+
+  Widget _buildMovieItem(int index) {
+    if (index == 1) {
+      return Column(
+        children: [
+          const SizedBox(height: 30),
+          MoviePosterLink(movie: widget.movies[index]),
+        ],
+      );
+    }
+
+    return MoviePosterLink(movie: widget.movies[index]);
   }
 }
