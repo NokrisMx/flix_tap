@@ -7,7 +7,16 @@ final GoRouter appRouter = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return HomeScreen(navigationShell: navigationShell);
+        final isMainRoute = {
+          '/',
+          '/categories',
+          '/favorites',
+        }.contains(state.uri.path);
+
+        return HomeScreen(
+          navigationShell: navigationShell,
+          showBottomNavigation: isMainRoute,
+        );
       },
       branches: [
         // Rama 0: Inicio
