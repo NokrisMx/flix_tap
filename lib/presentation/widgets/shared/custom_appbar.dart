@@ -16,18 +16,32 @@ class CustomAppbar extends ConsumerWidget {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: SizedBox(
           width: double.infinity,
           child: Row(
             children: [
-              Icon(Icons.movie_outlined, color: colors.primary),
-              SizedBox(width: 5),
-              Text('FlixTap', style: titleStyle),
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.movie_outlined, color: colors.primary),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'FlixTap',
+                style: titleStyle?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
 
               Spacer(),
 
-              IconButton(
+              IconButton.filledTonal(
+                tooltip: 'Buscar películas',
                 onPressed: () {
                   final searchedMovies = ref.read(searchedMoviesProvider);
                   final searchQuery = ref.read(searchQueryProvider);
@@ -49,7 +63,7 @@ class CustomAppbar extends ConsumerWidget {
                     }
                   });
                 },
-                icon: Icon(Icons.search),
+                icon: const Icon(Icons.search),
               ),
             ],
           ),

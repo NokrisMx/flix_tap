@@ -425,11 +425,12 @@ class _CustomSliverAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
     final isFavoriteFuture = ref.watch(isFavoriteMovieProvider(movie.id));
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     return SliverAppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       expandedHeight: size.height * 0.7,
-      foregroundColor: Colors.white,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
 
       actions: [
         IconButton(

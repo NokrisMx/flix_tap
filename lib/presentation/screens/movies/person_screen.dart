@@ -96,10 +96,12 @@ class _PersonSliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final colors = Theme.of(context).colorScheme;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     return SliverAppBar(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
+      backgroundColor: backgroundColor,
+      foregroundColor: colors.onSurface,
       expandedHeight: size.height * 0.62,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
@@ -137,7 +139,7 @@ class _PersonSliverAppBar extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     stops: [0.0, 0.3],
-                    colors: [Colors.black87, Colors.transparent],
+                    colors: [backgroundColor, Colors.transparent],
                   ),
                 ),
               ),
@@ -148,7 +150,7 @@ class _PersonSliverAppBar extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   stops: [0.5, 1],
-                  colors: [Colors.transparent, Colors.black87],
+                  colors: [Colors.transparent, backgroundColor],
                 ),
               ),
             ),
@@ -164,10 +166,14 @@ class _PersonImagePlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: Colors.black87,
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Center(
-        child: Icon(Icons.person_outline, size: 96, color: Colors.white54),
+        child: Icon(
+          Icons.person_outline,
+          size: 96,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
