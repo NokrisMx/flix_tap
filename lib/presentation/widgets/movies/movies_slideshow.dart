@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flix_tap/domain/entities/movie.dart';
+import 'package:go_router/go_router.dart';
 
 class MoviesSlideshow extends StatelessWidget {
   final List<Movie> movies;
@@ -21,7 +22,7 @@ class MoviesSlideshow extends StatelessWidget {
         autoplay: true,
         loop: false,
         pagination: SwiperPagination(
-          margin: const EdgeInsets.only(top: 0),
+          margin: EdgeInsets.only(top: 0),
           builder: DotSwiperPaginationBuilder(
             activeColor: colors.primary,
             color: colors.secondary,
@@ -43,13 +44,13 @@ class _Slide extends StatelessWidget {
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
       borderRadius: BorderRadius.circular(20),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 10)),
       ],
     );
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 30),
+      padding: EdgeInsets.only(bottom: 30),
       child: DecoratedBox(
         decoration: decoration,
         child: ClipRRect(
@@ -63,7 +64,10 @@ class _Slide extends StatelessWidget {
                   decoration: BoxDecoration(color: Colors.black12),
                 );
               }
-              return FadeIn(child: child);
+              return GestureDetector(
+                onTap: () => context.push('/movie/${movie.id}'),
+                child: FadeIn(child: child),
+              );
             },
           ),
         ),
