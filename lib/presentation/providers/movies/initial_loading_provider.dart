@@ -86,7 +86,9 @@ class InitialLoadingNotifier extends StateNotifier<AsyncValue<void>> {
         break;
       case InitialLoadTarget.person:
       case InitialLoadTarget.home:
+        break;
       case InitialLoadTarget.favorites:
+        ref.invalidate(categoriesProvider);
         break;
     }
 
@@ -114,7 +116,10 @@ class InitialLoadingNotifier extends StateNotifier<AsyncValue<void>> {
           await ref.read(categoriesProvider.future);
           break;
         case InitialLoadTarget.favorites:
-          await ref.read(favoriteMoviesProvider.notifier).loadNextPage();
+          await Future.wait([
+            ref.read(categoriesProvider.future),
+            ref.read(favoriteMoviesProvider.notifier).loadNextPage(),
+          ]);
           break;
         case InitialLoadTarget.categoryMovies:
           await Future.wait([
