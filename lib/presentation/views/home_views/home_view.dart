@@ -50,24 +50,24 @@ class HomeViewState extends ConsumerState<HomeView> {
                 //CustomAppbar(),
 
                 MoviesSlideshow(movies: slideshowMovies),
-
+                SizedBox(height: 10),
                 MovieHorizontalListview(
                   movies: nowPlayingMovies,
                   title: 'En cines',
-                  subTitle: 'En este mes',
+                  //subTitle: 'En este mes',
                   loadNextPage: () => ref
                       .read(nowPlayingMoviesProvider.notifier)
                       .loadNextPage(),
                 ),
-
+                SizedBox(height: 10),
                 MovieHorizontalListview(
                   movies: upcomingMovies,
                   title: 'Próximamente',
-                  subTitle: 'Este año',
+                  //subTitle: 'Este año',
                   loadNextPage: () =>
                       ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
                 ),
-
+                SizedBox(height: 10),
                 MovieHorizontalListview(
                   movies: popularMovies,
                   title: 'Populares',
@@ -75,11 +75,11 @@ class HomeViewState extends ConsumerState<HomeView> {
                   loadNextPage: () =>
                       ref.read(popularMoviesProvider.notifier).loadNextPage(),
                 ),
-
+                SizedBox(height: 10),
                 MovieHorizontalListview(
                   movies: topRatedMovies,
                   title: 'Mejor calificadas',
-                  subTitle: 'Desde siempre',
+                  //subTitle: 'Desde siempre',
                   loadNextPage: () =>
                       ref.read(topRatedMoviesProvider.notifier).loadNextPage(),
                 ),

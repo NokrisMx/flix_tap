@@ -198,13 +198,13 @@ class _CategoryCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Ink(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [colors.primaryContainer, colors.surface],
-          ),
-        ),
+        // decoration: BoxDecoration(
+        //   gradient: LinearGradient(
+        //     begin: Alignment.topLeft,
+        //     end: Alignment.bottomRight,
+        //     colors: [colors.primaryContainer, colors.surface],
+        //   ),
+        // ),
         child: InkWell(
           borderRadius: borderRadius,
           onTap: onTap,
