@@ -1,4 +1,4 @@
-package com.example.flix_tap
+package com.guevaraaldo.flixtap
 
 import io.flutter.embedding.android.FlutterActivity
 
