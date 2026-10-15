@@ -260,18 +260,23 @@ class _MovieInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 20, color: colors.primary),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.labelSmall?.copyWith(
-                letterSpacing: 0.4,
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              children: [
+                Icon(icon, size: 20, color: colors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.labelSmall?.copyWith(
+                    letterSpacing: 0.4,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
+
+            const SizedBox(height: 10),
             Text(
               value,
               maxLines: 1,
